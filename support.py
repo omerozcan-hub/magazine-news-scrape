@@ -46,10 +46,9 @@ def scrape_new(links):
         if scrape_type_1_check(soup1):
             title = soup1.find('h1', class_='rhd-article-title').get_text(strip=True)
 
-            news_texts = []
+            news_texts = ""
             for div in soup1.find_all('div', class_='text-container'):
-                news_text = div.get_text(strip=True) + ' '
-                news_texts.append(news_text)
+                news_texts = news_texts + div.get_text(strip=True) + ' '
 
             content = news_texts
 
