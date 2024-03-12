@@ -4,7 +4,7 @@ import time
 #scraping posta.com/magazin archive news
 
 def main():
-    scan_six_month(2023, 1, 6)
+    scan_quantity_month(2023, 3, 10)
 
 
 def scan_half_month(year, month, half_part):
@@ -32,9 +32,10 @@ def scan_a_month(year, month):
 
     print('1 aylık veri çekildi!!!!!')
 
-def scan_six_month(year, start_month, finish_month):
+def scan_quantity_month(year, start_month, quantity):
     month = start_month
-    for count in range(6):
+    finish_month = quantity + start_month - 1
+    for count in range(quantity):
         if month <= finish_month:
             for i in range(2):
                 urls_of_webarchive_days = start_scrape(year, month, i+1)
@@ -47,7 +48,7 @@ def scan_six_month(year, start_month, finish_month):
                 time.sleep(120)
         month += 1
 
-    print('6 aylık veri çekildi!!!!!')
+    print(quantity, ' aylık veri çekildi!!!!!')
 
 if __name__ == "__main__":
     main()
