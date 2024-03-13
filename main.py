@@ -5,7 +5,7 @@ import time
 
 def main():
     #scan_quantity_month(2023, 3, 10)
-    scan_half_month(2024, 1, 1)
+    scan_half_month(2016, 7, 1)
 
 def scan_half_month(year, month, half_part):
     urls_of_webarchive_days = start_scrape(year, month, half_part)
@@ -14,7 +14,7 @@ def scan_half_month(year, month, half_part):
 
     data = scrape_new(urls_of_news)
 
-    save_to_excel(data)
+    #save_to_database(data)
 
     print('yarım aylık veri çekildi!!!!!')
 
@@ -28,7 +28,6 @@ def scan_a_month(year, month):
         data = scrape_new(urls_of_news)
 
         save_to_database(data)
-        time.sleep(40)
 
     print('1 aylık veri çekildi!!!!!')
 
@@ -45,7 +44,6 @@ def scan_quantity_month(year, start_month, quantity):
                 data = scrape_new(urls_of_news)
 
                 save_to_database(data)
-                time.sleep(120)
         month += 1
 
     print(quantity, ' aylık veri çekildi!!!!!')
