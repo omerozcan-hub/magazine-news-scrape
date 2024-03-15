@@ -79,6 +79,7 @@ def save_to_excel(data):
         df = pd.DataFrame(data)
         df.to_excel(filename, index=False)
         print(f"Magazin haberleri başarıyla '{filename}' dosyasına kaydedildi.")
+        print(len(data), ' adet haber içeriği kaydedildi. 4/4- save to excel')
     else:
         print("Hiçbir haber bulunamadı.")
 
@@ -107,6 +108,7 @@ def save_to_database(data):
 
             connection.commit()
             print("Magazin haberleri başarıyla PostgreSQL veritabanına kaydedildi.")
+            print(len(data), ' adet haber içeriği kaydedildi. 4/4- save to db')
         except (Exception, psycopg2.Error) as error:
             print("Veritabanına kaydetme hatası:", error)
         finally:
@@ -123,7 +125,7 @@ def save_to_database(data):
 def scrape_webarchive_new_links_on_a_day(url):
     links = []
 
-    req = requests.get(url, timeout=120)
+    req = requests.get(url, timeout=(120))
     soup = BeautifulSoup(req.text, 'html.parser')
 
     if soup.find_all("div", class_="newsbox"):

@@ -4,8 +4,8 @@ import time
 #scraping posta.com/magazin archive news
 
 def main():
-    #scan_quantity_month(2023, 3, 10)
-    scan_half_month(2016, 7, 1)
+    scan_quantity_month(2022, 1, 12)
+
 
 def scan_half_month(year, month, half_part):
     urls_of_webarchive_days = start_scrape(year, month, half_part)
@@ -29,6 +29,8 @@ def scan_a_month(year, month):
 
         save_to_database(data)
 
+        time.sleep(40)
+
     print('1 aylık veri çekildi!!!!!')
 
 def scan_quantity_month(year, start_month, quantity):
@@ -44,7 +46,9 @@ def scan_quantity_month(year, start_month, quantity):
                 data = scrape_new(urls_of_news)
 
                 save_to_database(data)
+                time.sleep(90)
         month += 1
+
 
     print(quantity, ' aylık veri çekildi!!!!!')
 
