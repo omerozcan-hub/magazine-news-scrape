@@ -4,7 +4,8 @@ import time
 #scraping posta.com/magazin archive news
 
 def main():
-    scan_quantity_month(2022, 1, 12)
+    scan_half_month(2022, 6, 2)
+    scan_quantity_month(2022, 7, 6)
 
 
 def scan_half_month(year, month, half_part):
@@ -14,7 +15,7 @@ def scan_half_month(year, month, half_part):
 
     data = scrape_new(urls_of_news)
 
-    #save_to_database(data)
+    save_to_database(data)
 
     print('yarım aylık veri çekildi!!!!!')
 

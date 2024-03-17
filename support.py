@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import pandas as pd
 import psycopg2
+import validators
 
 
 # support functions
@@ -37,9 +38,14 @@ def scrape_new(links):
     news_count = 0
 
     for link in links:
-        req1 = requests.get(link)
-        if req1.status_code != 200:
-            print(f"{link} yüklenemedi.")
+        if not validators.url(link):
+            print(f"{link} geçersiz bir URL. Atlanıyor.")
+            continue
+        try:
+            req1 = requests.get(link)
+            req1.raise_for_status()  # HTTP hatalarını tespit etmek için eklenmiştir.
+        except requests.exceptions.RequestException as e:
+            print(f"{link} yüklenemedi: {e}")
             continue
         soup1 = BeautifulSoup(req1.text, 'html.parser')
 
