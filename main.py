@@ -4,8 +4,7 @@ import time
 #scraping posta.com/magazin archive news
 
 def main():
-    scan_half_month(2022, 6, 2)
-    scan_quantity_month(2022, 7, 6)
+    scan_quantity_month(2020, 1, 12)
 
 
 def scan_half_month(year, month, half_part):

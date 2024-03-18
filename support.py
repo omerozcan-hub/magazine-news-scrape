@@ -6,6 +6,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 import psycopg2
 import validators
+import json
+
+# import config infos
+file = open('config.json', 'r')
+config = json.load(file)
+file.close()
 
 
 # support functions
@@ -94,11 +100,11 @@ def save_to_database(data):
     if data:
         try:
             connection = psycopg2.connect(
-                user="postgres",
-                password="admin",
-                host="localhost",
-                port="5432",
-                database="NaturelLanguageProcessing"
+                user=config['database']['username'],
+                password=config['database']['password'],
+                host=config['database']['host'],
+                port=config['database']['port'],
+                database=config['database']['database']
             )
             cursor = connection.cursor()
 
@@ -201,17 +207,21 @@ def scrape_webarchive_new_links_on_a_day(url):
 
     return links
 
+
 def fix_url(url):
     splitted_url = url.split('https://')[-1]
     url = 'https://' + splitted_url
 
     return url
 
+
 def fix_url_v2(url):
     splitted_url = url.split('http://')[-1]
     url = 'http://' + splitted_url
 
     return url
+
+
 def scrape_webarchive_scan_days_for_a_year(year):
     urls = []
     start_date = datetime(year, 1, 1)
@@ -228,6 +238,7 @@ def scrape_webarchive_scan_days_for_a_year(year):
         current_date += timedelta(days=1)
 
     return urls
+
 
 def scrape_webarchive_scan_days_for_a_month(year, month):
     urls = []
@@ -246,6 +257,7 @@ def scrape_webarchive_scan_days_for_a_month(year, month):
 
         current_date += timedelta(days=1)
     return urls
+
 
 def scrape_webarchive_scan_days_for_half_month(year, month, part):
     urls = []
@@ -267,3 +279,24 @@ def scrape_webarchive_scan_days_for_half_month(year, month, part):
         current_date += timedelta(days=1)
 
     return urls
+
+
+def remove_duplicates():
+    try:
+        connection = psycopg2.connect(
+            user=config['database']['username'],
+            password=config['database']['password'],
+            host=config['database']['host'],
+            port=config['database']['port'],
+            database=config['database']['database']
+        )
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT DISTINCT * FROM news;")
+    except (Exception, psycopg2.Error) as error:
+        print("Veritabanı hatası:", error)
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("Veritabanı bağlantısı kapandı.")
