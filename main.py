@@ -4,8 +4,9 @@ import time
 #scraping posta.com/magazin archive news
 
 def main():
-    scan_quantity_month(2020, 1, 12)
-
+    scan_half_month(2012, 7, 2)
+    scan_quantity_month(2012, 4, 12)
+    scan_quantity_month(2011, 1, 12)
 
 def scan_half_month(year, month, half_part):
     urls_of_webarchive_days = start_scrape(year, month, half_part)
@@ -46,7 +47,7 @@ def scan_quantity_month(year, start_month, quantity):
                 data = scrape_new(urls_of_news)
 
                 save_to_database(data)
-                time.sleep(90)
+                time.sleep(180)
         month += 1
 
 
@@ -54,3 +55,4 @@ def scan_quantity_month(year, start_month, quantity):
 
 if __name__ == "__main__":
     main()
+9

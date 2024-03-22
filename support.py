@@ -137,7 +137,7 @@ def save_to_database(data):
 def scrape_webarchive_new_links_on_a_day(url):
     links = []
 
-    req = requests.get(url, timeout=(120))
+    req = requests.get(url, timeout=(360))
     soup = BeautifulSoup(req.text, 'html.parser')
 
     if soup.find_all("div", class_="newsbox"):
@@ -145,8 +145,7 @@ def scrape_webarchive_new_links_on_a_day(url):
         boxs = soup.find_all("div", class_="newsbox")
 
         for box in boxs:
-            box_url = box.find('div', class_='newsbox__text').find('a')['href']
-            url = fix_url(box_url)
+            url = box.find('div', class_='newsbox__text').find('a')['href']
             links.append(url)
 
     elif soup.find_all("div", class_="main-card"):
@@ -155,7 +154,6 @@ def scrape_webarchive_new_links_on_a_day(url):
 
         for card in cards:
             link = card.find('a')['href']
-            link = fix_url(link)
             links.append(link)
 
     elif soup.find_all('div', class_='box small'):
@@ -164,60 +162,91 @@ def scrape_webarchive_new_links_on_a_day(url):
         boxes = soup.find_all('div', class_='box small')
 
         for box in boxes:
-            box_url = box.find('a')['href']
-            url = fix_url(box_url)
+            url = box.find('a')['href']
             links.append(url)
 
         if soup.find('div', class_='item'):
             slider_items = soup.find_all('div', class_='item')
             for item in slider_items:
-                item_url = item.find('a')['href']
-                url = fix_url(item_url)
+                url = item.find('a')['href']
                 links.append(url)
 
     elif soup.find_all('div', class_="listNewsContainerDiv"):
         # 2010, 2011, 2012, 2013, 2014, 2015, 2016
-        if soup.find_all('div', class_='mIMG'):
-            mini_images = soup.find('div', class_='mIMG')
-            mini_images_tags = mini_images.find_all('a')
-
-            for m_img in mini_images_tags:
-                url = fix_url_v2(m_img['href'])
-                links.append(url)
-
         if soup.find('div', class_='list3'):
             list1 = soup.find('div', class_='list3')
             list_tags = list1.find_all('a')
 
             for tag in list_tags:
-                url = fix_url_v2(tag['href'])
+                url = tag['href']
                 links.append(url)
 
         if soup.find('div', class_='list2'):
-            list2 = soup.find('div', class_='list2')
-            list_tags = list2.find_all('a')
-
-            for tag in list_tags:
-                url = fix_url_v2(tag['href'])
+            divs = soup.find_all('div', class_='listNewsContainerDiv')
+            for div in divs:
+                url = div.find('a')['href']
                 links.append(url)
 
+        if soup.find('div', class_='mList'):
+            main_div = soup.find('div', class_='mList')
+            lis = main_div.find_all('li')
+            for li in lis:
+                url = li.find('a')['href']
+                links.append(url)
+
+        if soup.find('div', class_='sManset'):
+            main_div = soup.find('div', class_='sManset')
+            lis = main_div.find_all('li')
+            for li in lis:
+                url = li.find('a')['href']
+                links.append(url)
     else:
         print("haber card/box'lari bulunamadi")
         return None
 
+    links = fix_url(links)
     return links
 
 
-def fix_url(url):
-    splitted_url = url.split('https://')[-1]
-    url = 'https://' + splitted_url
+def fix_url(links):
+    urls = []
+
+    if not links:
+        print("Bağlantı listesi boş.")
+        return urls
+
+    if validators.url(fix_url_v1(links[1])):
+        for link in links:
+            urls.append(fix_url_v1(link))
+    elif validators.url(fix_url_v2(links[1])):
+        for link in links:
+            urls.append(fix_url_v2(link))
+    elif validators.url(fix_url_v3(links[1])):
+        for link in links:
+            urls.append(fix_url_v3(link))
+    else:
+        print("fix url methodları yetersiz kaldı.")
+
+    return urls
+
+
+def fix_url_v1(url):
+    splitted_url = url.split('www.posta.com')[-1]
+    url = 'https://www.posta.com' + splitted_url
 
     return url
 
 
 def fix_url_v2(url):
-    splitted_url = url.split('http://')[-1]
-    url = 'http://' + splitted_url
+    splitted_url = url.split('www.posta.com')[-1]
+    url = 'www.posta.com' + splitted_url
+
+    return url
+
+
+def fix_url_v3(url):
+    splitted_url = url.split('http://www.posta.com')[-1]
+    url = 'https://www.posta.com' + splitted_url
 
     return url
 
@@ -292,7 +321,10 @@ def remove_duplicates():
         )
         cursor = connection.cursor()
 
-        cursor.execute("SELECT DISTINCT * FROM news;")
+        cursor.execute("CREATE TABLE new_table AS SELECT DISTINCT * FROM news;")
+        cursor.execute("DROP TABLE news;")
+        cursor.execute("ALTER TABLE new_table RENAME TO news;")
+
     except (Exception, psycopg2.Error) as error:
         print("Veritabanı hatası:", error)
     finally:
